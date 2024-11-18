@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   ros2:
     build:
@@ -10,12 +8,17 @@ services:
 
     # Enabling GPU access with Compose
     # https://docs.docker.com/compose/gpu-support/
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #          - capabilities: [gpu]
-    #            count: all
+    #https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt
+    # para placas da amd é diferente
+    
+    command: nvidia-smi
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
     environment:
       # Set a fancy prompt (See ~/.bashrc in the container)

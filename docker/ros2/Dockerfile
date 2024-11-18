@@ -3,25 +3,36 @@
 
 # https://github.com/osrf/docker_images/blob/master/README.md#ros---1
 # https://github.com/osrf/docker_images/blob/master/ros/galactic/ubuntu/focal/desktop/Dockerfile
-FROM osrf/ros:galactic-desktop
+# This is an auto generated Dockerfile for ros:desktop-full
+# generated from docker_images_ros2/create_ros_image.Dockerfile.em
+FROM osrf/ros:jazzy-desktop-noble
 
-ARG user_id=1000
+ARG USERNAME=dockeruser
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
 ARG ros_ws=/home/dockeruser/dev_ws
-
 ENV DEBIAN_FRONTEND=noninteractive
+RUN if id -u $USER_UID ; then userdel `id -un $USER_UID` ; fi
 
+# Create the user
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    #
+    # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
+    && apt-get update \
+    && apt-get install -y sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
 # Install packages.
-RUN apt-get update && apt-get install -y \
-    ros-${ROS_DISTRO}-gazebo-* \
+RUN apt-get update && apt-get install -y --no-install-recommends\
+    ros-jazzy-desktop-full=0.11.0-1* \
     python-is-python3 \
     nano \
     less \
-    xterm
-#    && rm -rf /var/lib/apt/lists/*
+    xterm \
+    && rm -rf /var/lib/apt/lists/*
 
-# Switch to a non-root user.
-RUN useradd -m --uid ${user_id} dockeruser
-USER dockeruser
+
 
 # Working directory
 WORKDIR /home/dockeruser
